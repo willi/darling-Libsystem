@@ -202,13 +202,18 @@ libSystem_initializer(int argc,
 		.pthread_clear_qos_tsd = _pthread_clear_qos_tsd,
 		// V4 functions
 		.pthread_current_stack_contains_np = pthread_current_stack_contains_np,
+	};
+
 #ifdef DARLING
+	// registered separately so that libsystem_kernel can tell Darling's libSystem from Apple's (iOS Simulator)
+	static const struct _libkernel_darling_functions libkernel_darling_funcs = {
+		.version = 1,
 		.dyld_func_lookup = _dyld_func_lookup,
 		.posix_spawn_prepare = libSystem_posix_spawn_prepare,
 		.posix_spawn_parent = libSystem_posix_spawn_parent,
 		.posix_spawn_child = libSystem_posix_spawn_child,
-#endif
 	};
+#endif
 
 	static const struct _libpthread_functions libpthread_funcs = {
 		.version = 2,
@@ -229,6 +234,9 @@ libSystem_initializer(int argc,
 	
 	_libSystem_ktrace0(ARIADNE_LIFECYCLE_libsystem_init | DBG_FUNC_START);
 
+#ifdef DARLING
+	__libkernel_darling_init(&libkernel_darling_funcs);
+#endif
 	__libkernel_init(&libkernel_funcs, envp, apple, vars);
 	_libSystem_ktrace_init_func(KERNEL);
 
