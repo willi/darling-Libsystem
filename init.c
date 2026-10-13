@@ -90,9 +90,6 @@ extern void _malloc_fork_parent(void);
 extern void _malloc_fork_child(void);
 
 extern void _mach_fork_child(void);
-#ifdef DARLING
-extern void _mach_fork_parent(void);
-#endif
 extern void _notify_fork_child(void);
 extern void _dyld_atfork_prepare(void);
 extern void _dyld_atfork_parent(void);
@@ -109,10 +106,6 @@ extern void _asl_fork_child(void);
 // libsystem_coreservices.dylib
 extern void _libcoreservices_fork_child(void);
 extern char *_dirhelper(int, char *, size_t);
-#endif
-
-#ifdef DARLING
-extern void kqueue_atfork(void);
 #endif
 
 // advance decls for below;
@@ -400,10 +393,6 @@ libSystem_atfork_parent(void)
 	_libSC_info_fork_parent();
 #endif // !TARGET_OS_DRIVERKIT
 
-#ifdef DARLING
-	_mach_fork_parent();
-#endif
-
 	// second call client parent handlers registered with pthread_atfork()
 	_pthread_atfork_parent_handlers();
 }
@@ -435,10 +424,6 @@ libSystem_atfork_child(void)
 
 	// second call client parent handlers registered with pthread_atfork()
 	_pthread_atfork_child_handlers();
-
-#ifdef DARLING
-	kqueue_atfork();
-#endif
 }
 
 #ifdef DARLING
@@ -474,10 +459,6 @@ void libSystem_posix_spawn_parent(void) {
 	xpc_atfork_parent();
 	_libSC_info_fork_parent();
 #endif // !TARGET_OS_DRIVERKIT
-
-#ifdef DARLING
-	_mach_fork_parent();
-#endif
 };
 
 void libSystem_posix_spawn_child(void) {
@@ -502,10 +483,6 @@ void libSystem_posix_spawn_child(void) {
 #if !TARGET_OS_DRIVERKIT
 	_libSC_info_fork_child();
 #endif // !TARGET_OS_DRIVERKIT
-
-#ifdef DARLING
-	kqueue_atfork();
-#endif
 };
 #endif
 
